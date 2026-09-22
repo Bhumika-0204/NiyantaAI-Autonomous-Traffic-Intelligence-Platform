@@ -1,28 +1,96 @@
 # Niyanta AI - Architecture & System Design
 
-This document details the engineering paradigms and agent-to-agent architectures handling request evaluation within **Niyanta AI**.
+This document details the engineering paradigms, agent-to-agent communication, and 5-plane security architecture within **Niyanta AI**.
 
-## 🏗️ Core Gateway Pipeline
-Instead of a monolithic networking script, the system relies on an application-level FastAPI middleware interceptor. 
-1. Every incoming HTTP request touches the `TrafficGatewayMiddleware` before routing to internal code.
-2. The Gateway makes an `O(1)` memory cache lookup query against the **Execution Agent** to determine if the specific IP has an existing TTL verdict (Allow, Throttle, or Block).
-3. If throttled, the request is run through a strict **Token Bucket Rate Limiter**. If empty, a `429 Too Many Requests` is returned. Else, the request finishes via the `call_next()` hook.
+---
 
-## 📡 Agent Communication Flow
-The intelligence suite operates largely out-of-band utilizing Python `asyncio` event loops to prevent GIL locking:
-- **Monitoring Agent**: Replaces simulated loop ticks with real `psutil.net_io_counters()` tracking to observe the host machine's actual server load, hardware latency variations, and interface bandwidth drops.
-- **Prediction Agent**: Unpacks a persisted `LogisticRegression` memory block (`congestion_model.pkl`). Instead of theoretical inputs, it maps physical host network matrices directly against the trained feature weights, running `predict_proba()` to estimate an exact likelihood index of hardware routing collapse.
-- **Anomaly Agent**: Currently configured to catch severe request rate variance spikes mathematically to enforce instant DDoS IP blocking without waiting for the ML inference loop.
-- **Reasoning Agent (RAG layer)**: Hooked asynchronously to API decision events. Employs ChromaDB to retrieve system networking policies, then queries a foundational LLM model (OpenAI GPT-4 class) to construct plain-text reasoning summaries visible live on the Frontend React Dashboard.
+## 🏗️ 5-Plane Security Architecture
 
-## 🚀 Scaling Design Patterns
-To meet the horizontal scaling demands required of an API gateway:
-- **Centralized Persistence**: The currently defined local HashMaps inside `execution_agent.py` and `rate_limiter.py` have abstracted interfaces, designed to be swapped natively with `Redis` sets and Redis Lua execution scripts for multi-pod architectures instantly.
-- **Multiprocessing**: Designed specifically to support production environments orchestrating `gunicorn` coupled with `-k uvicorn.workers.UvicornWorker` classes, enabling 10K+ req/s ceilings across clustered vCPUs.
+Niyanta AI follows a clean separation of concerns across 5 distinct planes:
 
-## 🔗 Endpoint Definitions
-* `POST /analyze` - ML feature consumption evaluating real-time subsystem state indices and generating risk vectors.
-* `POST /explain` - Active execution of the Reasoning Agent RAG/LLM inference.
-* `POST /query` - Low-level manual Chroma DB query.
-* `GET /metrics` - Raw output of tracked telemetry.
-* `WS /ws/stream` - The core WebSocket broadcasting bridge streaming synchronized metrics directly down to connected React Clients natively.
+```
+┌─────────────────────────────────────────────────────────┐
+│                 1. Control Plane & UI                   │
+│  React Dashboard · Chaos Studio · Attack Replay Studio  │
+└────────────────────────────┬────────────────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────┐
+│                 2. Intelligence & Routing Plane         │
+│  Isolation Forest · PPO RL · GLB Multi-Region Anycast   │
+│  Threat Intel Feeds · GraphQL Depth & Complexity Guard  │
+└────────────────────────────┬────────────────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────┐
+│                 3. Enforcement Plane                    │
+│   Token Bucket · Circuit Breakers · WAF Scanner         │
+│   gRPC & HTTP/2 Stream Concurrency Inspector            │
+└────────────────────────────┬────────────────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────┐
+│                 4. Data Plane (Gateway)                 │
+│   FastAPI Middleware · Redis Lua · RFC 6585 Headers     │
+└────────────────────────────┬────────────────────────────┘
+                             │
+┌────────────────────────────▼────────────────────────────┐
+│                 5. Kernel Fast Path                     │
+│   eBPF / XDP Ingress Filtering · BCP38 Spoof Filter     │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🛡️ Core Interceptor Pipeline
+
+Every incoming HTTP request flows through 4 asynchronous FastAPI middleware interceptors before hitting internal route handlers:
+
+1. **`WafScannerMiddleware`**:
+   * Scans URIs and POST body payloads for SQL Injection, XSS, and Command Injection attacks.
+   * Enforces AST query depth and complexity scoring for GraphQL endpoints.
+   * Returns HTTP `403 Forbidden` for malicious strings.
+
+2. **`ZeroTrustMiddleware`**:
+   * Validates JWT Bearer tokens and request timestamp signatures (`X-Timestamp`, `X-Signature`) for replay attack protection.
+
+3. **`NetworkProtectionMiddleware`**:
+   * Applies Layer 7 Slow Loris timeouts and Layer 4 RED/CoDel queueing delay headers (`X-Niyanta-CoDel: congested`).
+   * Enforces gRPC & HTTP/2 multiplexed stream caps (max 100 concurrent streams per IP).
+
+4. **`TrafficGatewayMiddleware`**:
+   * Queries `ExecutionAgent` for cached IP verdicts.
+   * Executes Redis-backed Token Bucket rate limiting.
+   * Checks **Shadow Mode** status: if active, evaluates AI risk scores silently without dropping production requests.
+   * Injects standard **RFC 6585 Headers** (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`, `Retry-After`).
+
+---
+
+## 📡 Microservice Components & Intelligence Agents
+
+* **Monitoring Agent** (`monitoring_agent.py`): Tracks real-time host hardware metrics via `psutil` (CPU %, memory, bandwidth, packet rates).
+* **Bot Detector Service** (`bot_detector.py`): Analyzes header order, User-Agent, and `Sec-Ch-UA` headers to calculate bot ratios.
+* **Global Load Balancer Router** (`glb_router.py`): Evaluates multi-region latency & health metrics to select optimal Anycast ingress node.
+* **GraphQL Complexity Guard** (`graphql_analyzer.py`): Parses GraphQL queries to compute depth and field complexity scores.
+* **Threat Intelligence Service** (`threat_intel.py`): Queries live blocklists (AbuseIPDB, AlienVault OTX, Tor Exit Nodes).
+* **gRPC Binary Inspector** (`grpc_inspector.py`): Inspects Protobuf binary frame headers and HTTP/2 stream multiplexing bounds.
+* **Circuit Breaker Manager** (`circuit_breaker.py`): Manages downstream endpoint health (`CLOSED`, `OPEN`, `HALF-OPEN`).
+* **Alert Service** (`alert_service.py`): Formats and dispatches real-time webhooks to Slack, Discord, and Telegram.
+* **SIEM Exporter** (`siem_exporter.py`): Formats structured Common Event Format (CEF) and JSON logs for Splunk and Datadog.
+
+---
+
+## 🔗 Endpoint API Registry
+
+* `POST /api/v1/analyze`: Full ML pipeline evaluation (Isolation Forest + PPO + Bot Fingerprinting).
+* `POST /api/v1/analyze-request`: Atomic sub-millisecond Redis Lua token bucket check + PPO inference.
+* `POST /api/v1/chaos/inject`: Chaos Engineering fault injection (latency, packet loss, Redis outage).
+* `GET /api/v1/glb/status`: Multi-Region Global Load Balancer optimal routing status.
+* `POST /api/v1/graphql/analyze`: GraphQL query depth & complexity security analysis.
+* `GET /api/v1/threat-intel/status`: Real-time AbuseIPDB & AlienVault threat feed integration status.
+* `GET /api/v1/waf/stats`: Real-time WAF violation statistics.
+* `GET /api/v1/bot/stats`: Bot vs Human traffic ratio telemetry.
+* `POST /api/v1/feedback/false-positive`: Live AI feedback loop for IP unblocking.
+* `GET /api/v1/circuit-breaker/status`: Health status of all downstream route circuit breakers.
+* `POST /api/v1/shadow-mode/toggle`: Enable/disable silent AI evaluation.
+* `POST /api/v1/replay-attack`: What-If attack scenario simulation.
+* `GET /api/v1/reports/export`: Executive CSV / JSON audit log export (SOC2).
+* `GET /api/v1/siem/export`: CEF / JSON log stream export for Splunk / Datadog.
+

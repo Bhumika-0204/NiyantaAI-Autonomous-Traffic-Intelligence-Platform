@@ -41,6 +41,13 @@ class ExecutionAgent:
             logger.info(f"ExecutionAgent: Cached action '{action}' for IP {ip} (TTL: {ttl_seconds}s)")
         
         self.security_events.appendleft(event)
+
+    def unblock_ip(self, ip: str):
+        if ip in self.blocklist:
+            self.blocklist.remove(ip)
+        if ip in self.decision_cache:
+            del self.decision_cache[ip]
+        logger.info(f"ExecutionAgent: IP {ip} removed from blocklist.")
             
     def get_action(self, ip: str) -> str:
         if ip in self.blocklist:

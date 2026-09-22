@@ -1,131 +1,107 @@
 # Niyanta AI 
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue.svg) ![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Version](https://img.shields.io/badge/version-3.0.0-blue.svg) ![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-**Niyanta AI** is an enterprise-grade, distributed AI-powered API Gateway. It protects upstream backend services from congestion, DDoS spikes, and erratic traffic through the real-time application of **Reinforcement Learning (PPO)**, **Redis-backed distributed Token Bucket rate limiting**, and **15 computer networking protection mechanisms** implemented directly at the application gateway layer.
+**Niyanta AI** is an enterprise-grade, distributed AI-powered API Gateway & Security Platform. It protects upstream backend services from congestion, DDoS spikes, and erratic traffic through the real-time application of **Reinforcement Learning (PPO)**, **Redis-backed distributed Token Bucket rate limiting**, **WAF Payload Inspection**, **Bot Fingerprinting**, **Global Load Balancer Multi-Region Anycast Router**, **Chaos Engineering Studio**, **GraphQL Depth & Complexity Guard**, **Threat Intelligence Feeds**, and **20 computer networking protection mechanisms** implemented directly at the application gateway layer.
 
 ---
 
-## 🧠 AI & Machine Learning
+## 🧠 AI & Machine Learning Suite
 
 | Component | Technology | Purpose |
 |:---|:---|:---|
 | Congestion Prediction | PPO Reinforcement Learning (PyTorch) | Dynamic allow/throttle/block decisions |
 | DDoS Detection | Isolation Forest (Scikit-Learn) | Unsupervised anomaly scoring |
+| Online Feedback Loop | Live Weight Tuning Engine | "Flag False Positive" live unblocking & model calibration |
 | Explainability | ChromaDB + OpenAI RAG + SHAP | Human-readable audit logs |
-| Model Lifecycle | MLflow | Versioning, canary deploy, rollback |
+| Attack Simulation | What-If Replay Studio | Dynamic policy scenario simulation |
+| Chaos Engineering | Fault Injection Engine | Latency, packet loss & Redis outage auto-healing verification |
+| MLOps Lifecycle | MLflow | Versioning, canary deploy, rollback |
 
 ---
 
-## 🛡️ Computer Networking Protection Stack (15 Mechanisms)
+## 🛡️ Computer Networking & Enterprise Security Stack (20 Mechanisms)
 
-### Layer 7 — Application Layer
+### Layer 7 — Application, WAF & Next-Gen Layer
 | # | Mechanism | Description |
 |:--|:---|:---|
-| 1 | **Slow Loris Prevention** | Abort connections that don't complete headers within 30s. Prevents thread exhaustion from slow HTTP attacks. |
-| 2 | **AIMD Adaptive Throttle** | Additive Increase Multiplicative Decrease. Halves rate allocation when latency > 500ms, grows it additively when fast. |
-| 3 | **Backpressure Propagation** | Sends `Retry-After` headers dynamically scaled to CPU load. Instructs clients to self-throttle before hammering. |
-| 4 | **HTTP/2 Stream Concurrency Cap** | Limits each IP to 100 concurrent HTTP/2 streams to prevent multiplexing-based flood attacks. |
-| 5 | **Connection Draining Signal** | On SIGTERM, sets a drain flag returning `503 + Retry-After` for new connections while completing existing ones. |
+| 1 | **WAF Payload Inspector** | Real-time regex & heuristic inspection for SQL Injection (SQLi), Cross-Site Scripting (XSS), and Command Injection. |
+| 2 | **Bot Fingerprinting (JA4)** | Header order, `User-Agent`, and `Sec-Ch-UA` analysis to isolate automated scripts (`curl`, `python-requests`, `Puppeteer`) from human web browsers. |
+| 3 | **GraphQL Depth & Complexity Guard** | AST complexity analyzer that restricts query depth (max 7) and complexity score (max 100) to block recursive GraphQL DoS attacks. |
+| 4 | **gRPC & HTTP/2 Inspector** | Stream concurrency enforcer (max 100 multiplexed streams) and Protobuf frame boundary inspector to prevent HTTP/2 Rapid Reset attacks. |
+| 5 | **Threat Intelligence Feeds** | Live reputation scoring with blocklist lookup against AbuseIPDB, AlienVault OTX, and Tor Exit Node databases. |
+| 6 | **Slow Loris Prevention** | Abort connections that don't complete headers within 30s. Prevents thread exhaustion from slow HTTP attacks. |
+| 7 | **AIMD Adaptive Throttle** | Additive Increase Multiplicative Decrease. Halves rate allocation when latency > 500ms, grows it additively when fast. |
+| 8 | **RFC 6585 Rate Headers** | Standardized response headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`, `Retry-After`). |
+| 9 | **Tiered API Key Quotas** | Scoped quotas per API plan (Free Tier: 100 req/min, Pro Tier: 5,000 req/min, Enterprise Tier: 50,000 req/min). |
+| 10 | **Shadow Mode (Dark Launch)**| Silent AI risk scoring mode that evaluates traffic without blocking production users. |
+| 11 | **Connection Draining Signal** | On SIGTERM, sets a drain flag returning `503 + Retry-After` for new connections while completing existing ones. |
 
-### Layer 4 — Transport / Queue Management
+### Layer 4 & Multi-Region Global Routing
 | # | Mechanism | Description |
 |:--|:---|:---|
-| 6 | **RED (Random Early Detection)** | Probabilistically drops packets as queue load rises between 50–85% CPU, triggering sender-side congestion control before queue overflow. |
-| 7 | **CoDel (Controlled Delay)** | Measures per-request queue sojourn time. Emits `X-Niyanta-CoDel: congested` header when delay > 5ms (Google standard). Prevents bufferbloat. |
-| 8 | **Leaky Bucket Smoothing** | Maintains a constant output drain rate to the upstream service regardless of token bucket burst allowance. Absorbs thundering herds. |
-| 9 | **ECN (Explicit Congestion Notification)** | CoDel delay signal acts as an application-layer ECN equivalent — notifying senders of congestion without packet loss. |
+| 12 | **Global Load Balancer (GLB)** | Multi-Region Anycast routing score engine that continuously selects the lowest latency & healthiest cloud ingress region (US East, EU West, AP South Mumbai). |
+| 13 | **Chaos Engineering Studio** | Simulated fault injection engine (artificial latency, packet loss, Redis outage) to verify automated circuit breaker recovery. |
+| 14 | **Downstream Circuit Breaker** | Circuit Breaker pattern (`CLOSED`, `OPEN`, `HALF-OPEN`) per endpoint route. Trips when error rate > 50% or latency > 2000ms to shield databases. |
+| 15 | **RED (Random Early Detection)** | Probabilistically drops packets as queue load rises between 50–85% CPU, triggering sender-side congestion control before queue overflow. |
+| 16 | **CoDel (Controlled Delay)** | Measures per-request queue sojourn time. Emits `X-Niyanta-CoDel: congested` header when delay > 5ms (Google standard). Prevents bufferbloat. |
+| 17 | **Leaky Bucket Smoothing** | Maintains a constant output drain rate to the upstream service regardless of token bucket burst allowance. Absorbs thundering herds. |
 
-### Layer 3 — Network Layer
+### Enterprise SIEM & Compliance Reporting
 | # | Mechanism | Description |
 |:--|:---|:---|
-| 10 | **BCP38 Ingress Filtering** | Detects and drops packets where `X-Forwarded-For` claims an RFC1918 private IP from an external public interface — eliminates IP spoofing attacks. |
-
-### Quality of Service (QoS)
-| # | Mechanism | Description |
-|:--|:---|:---|
-| 11 | **DSCP Traffic Classification** | Marks requests with Differentiated Services Code Points: Premium → `EF`, Standard → `AF`, Suspect → `CS0`. Drives LB scheduling. |
-| 12 | **Weighted Fair Queuing (WFQ)** | Premium API keys bypass RED drops and leaky bucket limits. Standard clients share remaining bandwidth fairly. |
-
-### Infrastructure / Routing (Architectural)
-| # | Mechanism | Description |
-|:--|:---|:---|
-| 13 | **ECMP Routing** | Application-level latency-weighted round-robin (`ecmp_router.py`) + Kubernetes topology spread constraints (`ecmp-service.yaml`). |
-| 14 | **Anycast IP Strategy** | Multi-region K8s clusters share a single BGP-advertised VIP via ConfigMap — DDoS is geographically diluted. |
-| 15 | **TCP SYN Cookie + ECN** | Kernel-level protection via `node-hardening-daemonset.yaml` — runs `sysctl` on every K8s node automatically. |
+| 18 | **Real-Time Alert Webhooks** | Automated webhook dispatchers for Slack, Discord, and Telegram when CPU > 80% or DDoS detected. |
+| 19 | **SIEM Log Exporter** | Structured CEF (Common Event Format - Splunk) and JSON (Datadog/Syslog) security log exporter. |
+| 20 | **One-Click Audit Reports** | Executive CSV and JSON compliance report download (SOC2 / ISO27001). |
 
 ---
 
 ## 🏗️ Architecture Summary
 
 ```
-[Client] → [ELB/Anycast] → [NetworkProtectionMiddleware] → [TrafficGatewayMiddleware]
-               ↓                       ↓                              ↓
-         BCP38 Filter           RED · CoDel · Leaky           Redis Lua Token Bucket
-         Anycast Routing        Bucket · AIMD · WFQ            PPO RL Inference
-         ECMP Load Split        Slow Loris · H2 Cap            Anomaly Detection
-                                                                Kafka Telemetry Stream
+[Client] → [WafScannerMiddleware] → [ZeroTrustMiddleware] → [NetworkProtectionMiddleware] → [TrafficGatewayMiddleware]
+                ↓                          ↓                           ↓                           ↓
+          SQLi/XSS/Cmd           HMAC / JWT Validation        RED / CoDel Queueing         Token Bucket Rate Limiter
+          Bot Fingerprint        Replay Protection            Leaky Bucket Drain           PPO RL Policy Inference
+          GraphQL Guard                                       gRPC Stream Cap              Circuit Breaker Manager
+          Threat Intel Lookups                                Shadow Mode Evaluator
 ```
 
 ---
 
 ## 💻 Full Tech Stack
 
-### Core System
+### Core System & Security
 - **Framework**: `FastAPI` (Python 3.10+, fully async)
 - **State Store**: `Redis` Cluster + atomic Lua scripts
 - **Event Streaming**: `Apache Kafka`
+- **Security Protocols**: `Zero Trust JWT/HMAC`, `WAF Regex Engine`, `JA4 Bot Fingerprinter`, `GraphQL Depth Guard`, `gRPC Protocol Inspector`
+- **Global Routing**: `Multi-Region GLB Anycast Router`
 
-### Machine Learning
+### Machine Learning & Analytics
 - **RL Agent**: `PyTorch PPO`
 - **Anomaly Detection**: `Scikit-Learn Isolation Forest`
 - **Explainability**: `ChromaDB`, `OpenAI`, `SHAP`
-- **MLOps**: `MLflow`
-
-### DevOps & Cloud
-- **Containerization**: `Docker` & `Kubernetes`
-- **CI/CD**: `GitHub Actions`
-- **Observability**: `Prometheus`, `Grafana`, `OpenTelemetry`, `Jaeger`
+- **Simulation & Resilience**: What-If Attack Replay Engine, Chaos Engineering Studio
 
 ---
 
-## ✨ Key Differentiators vs Traditional NGINX Gateways
+## ⚙️ Setup & Testing Instructions
 
-| Feature | NGINX | Niyanta AI |
-|:---|:---|:---|
-| Rate Limiting | Static thresholds | ML-adaptive (PPO + hardware aware) |
-| DDoS Response | Manual rules | Automated Isolation Forest (< 5s) |
-| Congestion Queue | Tail-drop | RED + CoDel (probabilistic, delay-aware) |
-| Flow Control | Burst allowed | Leaky Bucket smooth output |
-| Explainability | None | RAG + SHAP for every decision |
-| Multi-node Sync | None | Redis Lua atomic (race-condition-free) |
-
----
-
-## ⚙️ Setup Instructions
-
-### 1. Prerequisites
-- Docker & Docker Compose
-- Python 3.10+
-- Valid `OPENAI_API_KEY`
-
-### 2. Environment Configuration
+### 1. Run Automated Live Test Suite
 ```bash
-git clone https://github.com/Bhumika-0204/NiyantaAI-Autonomous-Traffic-Intelligence-Platform.git
-cd NiyantaAI-Autonomous-Traffic-Intelligence-Platform
-cp .env.example .env
-# Edit .env with your keys
+# Start Backend
+cd backend && ..\.venv\Scripts\activate && python -m uvicorn app.main:app --port 8000
+
+# Run Phase 3 Automated Verification Test Suite
+python scratch/test_phase3_features.py
 ```
 
-### 3. Spin Up Cluster
-```bash
-docker-compose up -d --build
-```
-
-### 4. Access
-- **API Gateway**: `http://localhost:8000/docs`
+### 2. Access Web Control Dashboard
 - **React Dashboard**: `http://localhost:5173`
-- **Benchmarking**: `cd benchmarking && locust -f locustfile.py --host=http://localhost:8000`
+- **Chaos Engineering Studio**: `http://localhost:5173/chaos`
+- **Attack Replay Studio**: `http://localhost:5173/attack-replay`
+- **API Docs**: `http://localhost:8000/docs`
 
 ---
 
@@ -135,30 +111,29 @@ docker-compose up -d --build
 ├── backend/
 │   ├── app/
 │   │   ├── middleware/
-│   │   │   ├── gateway.py              # Token bucket + ML policy middleware
-│   │   │   └── network_protection.py   # 11 CN protection mechanisms (code)
-│   │   ├── ml/
-│   │   │   ├── ppo_agent.py            # PPO Reinforcement Learning
-│   │   │   └── anomaly_detector.py     # Isolation Forest DDoS detection
+│   │   │   ├── gateway.py              # Token bucket + RFC 6585 headers + Shadow Mode
+│   │   │   ├── waf_scanner.py          # SQLi, XSS, and Cmd Injection WAF scanner
+│   │   │   ├── zero_trust.py           # Zero Trust JWT & HMAC validation
+│   │   │   └── network_protection.py   # CoDel, RED, and Slow Loris protections
 │   │   ├── services/
-│   │   │   ├── distributed_limiter.py  # Redis Lua token bucket + Circuit Breaker
-│   │   │   ├── kafka_consumer.py       # Async Kafka anomaly pipeline
-│   │   │   └── ecmp_router.py          # ECMP latency-weighted load balancer
-│   │   └── api/routes.py              # FastAPI endpoints
+│   │   │   ├── bot_detector.py         # Bot Fingerprinting & JA4 header scanner
+│   │   │   ├── graphql_analyzer.py     # GraphQL Depth & Complexity Guard
+│   │   │   ├── glb_router.py           # Multi-Region Global Load Balancer
+│   │   │   ├── threat_intel.py         # AbuseIPDB & AlienVault Threat Feeds
+│   │   │   ├── grpc_inspector.py       # gRPC & HTTP/2 Binary Protocol Inspector
+│   │   │   ├── circuit_breaker.py      # Downstream Endpoint Circuit Breakers
+│   │   │   ├── alert_service.py        # Slack/Discord/Telegram Webhook alerts
+│   │   │   ├── siem_exporter.py        # CEF / JSON SIEM log exporter
+│   │   │   └── distributed_limiter.py  # Redis Lua token bucket
+│   │   └── api/routes.py              # Enterprise FastAPI endpoints
 ├── frontend/                           # React Real-Time Dashboard
-├── kubernetes/
-│   ├── gateway-deployment.yaml         # K8s HPA (3→50 pods)
-│   ├── ecmp-service.yaml               # ECMP LB + Anycast + Topology Spread
-│   └── node-hardening-daemonset.yaml   # SYN Cookie + ECN + BCP38 kernel tuning
-├── benchmarking/locustfile.py          # Load testing suite
-├── .github/workflows/ci_cd.yaml       # Full CI/CD pipeline
-├── docs/                               # Enterprise documentation
-│   ├── SYSTEM_ARCHITECTURE.md
-│   ├── KAFKA_PIPELINE_DESIGN.md
-│   ├── MLOPS_PIPELINE.md
-│   ├── RESILIENCE_AND_SECURITY.md
-│   ├── OBSERVABILITY_AND_TRACING.md
-│   └── INFRASTRUCTURE_AND_CHAOS.md
-├── FAANG_INTERVIEW_PREP.md
-└── INTERVIEW_PITCH.md
+│   ├── src/pages/
+│   │   ├── Dashboard.jsx               # Live network tracking + GLB Router & Threat Intel Cards
+│   │   ├── ChaosStudio.jsx             # Chaos Engineering Fault Injection Studio
+│   │   ├── AiInsights.jsx              # AI Reasoning Insights & High-Level Model Telemetry Hub
+│   │   ├── Security.jsx                # WAF status, Bot ratios, Circuit Breakers & CSV export
+│   │   ├── AttackReplay.jsx            # What-If Attack Replay Simulation Studio
+│   │   ├── Policies.jsx                # Alert Webhooks & Shadow Mode controls
+│   │   └── Analytics.jsx               # SIEM Log Exporter & Decision charts
+└── scratch/test_phase3_features.py     # Automated feature test script
 ```

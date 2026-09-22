@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Play, Square, Activity, Server, AlertCircle, Terminal, Download, RefreshCw, Layers, Zap, TrendingDown, AlignVerticalSpaceAround, Crosshair } from 'lucide-react';
+import { getApiUrl, getWsUrl } from '../config';
 
 export default function Dashboard() {
   const [sessionState, setSessionState] = useState('idle'); 
@@ -16,7 +17,8 @@ export default function Dashboard() {
   }, [logs]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/metrics')
+    const apiBase = getApiUrl().replace('/api/v1', '');
+    fetch(`${apiBase}/metrics`)
       .then(r => r.json())
       .then(d => setMetrics(d))
       .catch(e => console.error("Metrics API offline", e));
@@ -24,7 +26,7 @@ export default function Dashboard() {
     const clientId = "client_" + Math.random().toString(36).substring(2, 9);
     
     try {
-      ws.current = new WebSocket(`ws://127.0.0.1:8000/ws/stream/${clientId}`);
+      ws.current = new WebSocket(getWsUrl(`/ws/stream/${clientId}`));
       ws.current.onopen = () => addLog("[SYSTEM] WebSocket secured to Niyanta ML engine.");
       
       ws.current.onmessage = (event) => {

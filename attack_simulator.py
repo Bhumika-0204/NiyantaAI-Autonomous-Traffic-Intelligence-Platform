@@ -19,6 +19,9 @@ from concurrent.futures import ThreadPoolExecutor
 
 import sys
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 API_BASE = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000/api/v1"
 
 
@@ -154,7 +157,7 @@ def print_header():
     print(f"\n{COLORS['bold']}{'='*70}")
     print(f"  NIYANTA AI — ATTACK SIMULATION")
     print(f"  Sending traffic to http://localhost:8000")
-    print(f"  Open http://localhost:5173 → Security page to watch live!")
+    print(f"  Open http://localhost:5173 -> Security page to watch live!")
     print(f"{'='*70}{COLORS['reset']}\n")
 
 def print_stats():

@@ -72,38 +72,57 @@ niyanta_redis_failures_total 0.0
 
 ---
 
-## 3. Infrastructure Health
+## 4. Phase 3 Next-Gen & High-Level AI Endpoints
 
-### `GET /health`
-A vital endpoint utilized by the Kubernetes Liveness/Readiness probes and AWS ELB Target Groups. It verifies the availability of both the local FastAPI container and its connected distributed systems (Redis and Kafka).
-
-**Request:** `GET /health`
+### `GET /api/v1/ai/model-status`
+Returns high-level model architectures, neural parameters, loss metrics, and active agent statuses (PyTorch PPO, Isolation Forest, Agentic MAS, ChromaDB RAG).
 
 **Response (200 OK):**
 ```json
 {
-  "status": "healthy",
-  "version": "2.0.0",
-  "timestamp": "2026-04-10T19:40:12Z",
-  "components": {
-    "redis_cluster": "OK",
-    "kafka_producer": "OK",
-    "ml_engine_cache": "OK (Last Update: 2s ago)"
+  "models": {
+    "ppo_reinforcement_learning": {
+      "name": "PyTorch PPO Actor-Critic Neural Agent",
+      "type": "Reinforcement Learning (PPO)",
+      "status": "ACTIVE_INFERENCE",
+      "architecture": "Actor-Critic Dual-Head MLP (State: 4, Action: 3)"
+    },
+    "isolation_forest_ddos": {
+      "name": "Isolation Forest Anomaly Detector",
+      "type": "Unsupervised Machine Learning",
+      "estimators": 100,
+      "contamination_rate": 0.05
+    },
+    "agentic_ai_cluster": {
+      "name": "Autonomous Agentic AI Network Triad",
+      "type": "Multi-Agent System (MAS)"
+    },
+    "rag_genai_explainer": {
+      "name": "Generative AI RAG Explanation Engine",
+      "vector_store": "ChromaDB Persistent Collection"
+    }
   }
 }
 ```
 
-**Response (503 Service Unavailable - Integration Failure):**
-```json
-{
-  "status": "degraded",
-  "version": "2.0.0",
-  "timestamp": "2026-04-10T19:40:15Z",
-  "components": {
-    "redis_cluster": "FAIL (Circuit Breaker OPEN)",
-    "kafka_producer": "OK",
-    "ml_engine_cache": "OK"
-  },
-  "message": "Fallback LRU cache active. Primary rate limiter offline."
-}
-```
+### `POST /api/v1/chaos/inject`
+Chaos Engineering fault injection studio. Injects latency, packet loss, or Redis outages to test auto-healing resiliency.
+
+### `GET /api/v1/glb/status`
+Returns Multi-Region Anycast Global Load Balancer optimal cloud region selection and latency scores.
+
+### `POST /api/v1/graphql/analyze`
+Scans GraphQL AST queries to enforce max depth (7) and complexity score (100) limits.
+
+### `GET /api/v1/threat-intel/status`
+Scans IP reputations against AbuseIPDB, AlienVault OTX, and Tor Exit Node databases.
+
+### `POST /api/v1/feedback/false-positive`
+Online ML Feedback Loop: unblocks flagged IPs live and auto-tunes sensitivity without restarting.
+
+### `GET /api/v1/reports/export?format=csv`
+Exports executive SOC2 / ISO27001 security compliance audit logs in CSV or JSON.
+
+### `GET /api/v1/siem/export?format=cef`
+Exports Common Event Format (CEF) and JSON security events for Datadog, Splunk, and Syslog SOC ingestion.
+

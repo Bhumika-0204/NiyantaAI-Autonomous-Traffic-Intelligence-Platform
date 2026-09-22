@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { BarChart3, TrendingUp, RefreshCw } from 'lucide-react';
+import { getWsUrl } from '../config';
 
 export default function Analytics() {
   const [totals, setTotals] = useState({ allowed: 0, throttled: 0, blocked: 0 });
@@ -8,10 +9,7 @@ export default function Analytics() {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    const wsUrl = import.meta.env.VITE_API_URL 
-        ? import.meta.env.VITE_API_URL.replace(/^http/, 'ws').replace('/api/v1', '') + '/ws/analytics-client'
-        : 'ws://localhost:8000/ws/analytics-client';
-
+    const wsUrl = getWsUrl('/ws/analytics-client');
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => setConnected(true);
@@ -137,7 +135,7 @@ export default function Analytics() {
         </div>
       </div>
 
-      {}
+      {/* Cumulative Decision Breakdown */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
         <h3 className="text-xl font-semibold mb-6 text-gray-200">Cumulative Decision Breakdown</h3>
         <div style={{ width: '100%', height: 300 }}>
@@ -154,6 +152,28 @@ export default function Analytics() {
               <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* SIEM Log Exporter Card */}
+      <div className="bg-gray-900 border border-blue-900/40 rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div>
+          <h3 className="text-xl font-semibold text-white">Enterprise SIEM Security Log Exporter</h3>
+          <p className="text-sm text-gray-400 mt-1">Export structured CEF (Common Event Format) or JSON logs for Datadog, Splunk, and Syslog collectors.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => window.open(`${getApiUrl()}/siem/export?format=cef`, '_blank')}
+            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg text-xs transition"
+          >
+            Export CEF Format (Splunk)
+          </button>
+          <button
+            onClick={() => window.open(`${getApiUrl()}/siem/export?format=json`, '_blank')}
+            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg text-xs transition"
+          >
+            Export JSON Format (Datadog)
+          </button>
         </div>
       </div>
     </div>

@@ -63,4 +63,8 @@ class MonitoringAgent:
         
         return metrics
 
+    @property
+    def live_metrics(self) -> Dict[str, Any]:
+        return self.collect_live_device_metrics()
+
 monitor = MonitoringAgent()

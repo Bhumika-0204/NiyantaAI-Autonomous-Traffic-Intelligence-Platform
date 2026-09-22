@@ -12,7 +12,28 @@ class ZeroTrustMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
             
         allowed_paths = ["/", "/metrics", "/ecmp-status", "/docs", "/openapi.json"]
-        allowed_prefixes = ("/ws", "/api/v1/policies", "/api/v1/explain", "/api/v2/explain", "/api/v1/analyze")
+        allowed_prefixes = (
+            "/ws", 
+            "/api/v1/policies", 
+            "/api/v1/explain", 
+            "/api/v2/explain", 
+            "/api/v1/analyze", 
+            "/api/v1/security-events",
+            "/api/v1/waf", 
+            "/api/v1/bot", 
+            "/api/v1/alerts", 
+            "/api/v1/replay-attack", 
+            "/api/v1/reports",
+            "/api/v1/feedback",
+            "/api/v1/circuit-breaker",
+            "/api/v1/shadow-mode",
+            "/api/v1/siem",
+            "/api/v1/chaos",
+            "/api/v1/glb",
+            "/api/v1/graphql",
+            "/api/v1/threat-intel",
+            "/api/v1/ai"
+        )
         
         if request.url.path in allowed_paths or request.url.path.startswith(allowed_prefixes):
             return await call_next(request)

@@ -76,6 +76,9 @@ class NetworkProtectionMiddleware(BaseHTTPMiddleware):
     """
 
     async def dispatch(self, request: Request, call_next) -> Response:
+        if request.method == "OPTIONS":
+            return await call_next(request)
+
         client_ip = (request.client.host if request.client else "unknown")
         api_key = request.headers.get("X-API-Key", "")
         is_premium = api_key.startswith(PREMIUM_KEY_PREFIX)

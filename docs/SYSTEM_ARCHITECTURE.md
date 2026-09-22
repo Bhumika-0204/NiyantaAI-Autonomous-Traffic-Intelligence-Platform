@@ -117,9 +117,12 @@ Given distributed complexities, graceful degradation is essential:
 
 ---
 
-## H. Scale Targets
+## H. Scale Targets & Next-Gen Capabilities
 
 This architecture is optimized to support:
 - **Throughput:** `10K – 100K requests/second` per geographical region.
 - **Added Latency (Gateway Overhead):** `< 5ms` at P95 (95th percentile).
 - **High Availability:** `99.99%` uptime (4 nines via multi-AZ Kubernetes spanning).
+- **Next-Gen Guardrails:** Integrated GraphQL Query Depth & Complexity Guard, gRPC & HTTP/2 Stream Concurrency Inspector, Multi-Region Global Load Balancer (GLB), Live Threat Intelligence Feeds, and Chaos Engineering Fault Injection.
+- **High-Level AI Hub:** `GET /api/v1/ai/model-status` endpoint & interactive GenAI ChromaDB RAG Knowledge Terminal (`AiInsights.jsx`).
+

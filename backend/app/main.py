@@ -44,26 +44,21 @@ async def lifespan(app: FastAPI):
     monitoring_task.cancel()
     kafka_task.cancel()
 
+from app.middleware.waf_scanner import WafScannerMiddleware
+
 app = FastAPI(title=settings.PROJECT_NAME, lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "https://niyanta-ai-ml-congestion-control-three.vercel.app"
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
+app.add_middleware(WafScannerMiddleware)
 app.add_middleware(NetworkProtectionMiddleware)
-
-
 app.add_middleware(ZeroTrustMiddleware)
-
-
 app.add_middleware(TrafficGatewayMiddleware)
 
 app.include_router(api_router, prefix="/api/v1")

@@ -5,7 +5,9 @@ import Security from './pages/Security';
 import Analytics from './pages/Analytics';
 import ApiPlayground from './pages/ApiPlayground';
 import Policies from './pages/Policies';
-import { LayoutDashboard, BrainCircuit, ShieldAlert, BarChart3, TerminalSquare, Sliders } from 'lucide-react';
+import AttackReplay from './pages/AttackReplay';
+import ChaosStudio from './pages/ChaosStudio';
+import { LayoutDashboard, BrainCircuit, ShieldAlert, BarChart3, TerminalSquare, Sliders, PlayCircle, Flame } from 'lucide-react';
 
 function NavLink({ to, icon: Icon, children }) {
   const location = useLocation();
@@ -25,7 +27,7 @@ function App() {
   return (
     <Router>
       <div className="flex h-screen bg-gray-950 text-white font-sans overflow-hidden">
-        {}
+        {/* Navigation Sidebar */}
         <nav className="w-64 bg-gray-900 border-r border-gray-800 flex-col hidden md:flex">
           <div className="p-6 border-b border-gray-800">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent transform scale-105 origin-left">
@@ -38,18 +40,22 @@ function App() {
             <NavLink to="/ai-insights" icon={BrainCircuit}>AI Insights</NavLink>
             <NavLink to="/security" icon={ShieldAlert}>Security</NavLink>
             <NavLink to="/policies" icon={Sliders}>Policies</NavLink>
+            <NavLink to="/attack-replay" icon={PlayCircle}>Attack Replay</NavLink>
+            <NavLink to="/chaos" icon={Flame}>Chaos Studio</NavLink>
             <NavLink to="/analytics" icon={BarChart3}>Analytics</NavLink>
             <NavLink to="/api-playground" icon={TerminalSquare}>API Playground</NavLink>
           </div>
         </nav>
 
-        {}
+        {/* Main Content Area */}
         <main className="flex-1 flex flex-col h-full relative overflow-y-auto w-full">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/ai-insights" element={<AiInsights />} />
             <Route path="/security" element={<Security />} />
             <Route path="/policies" element={<Policies />} />
+            <Route path="/attack-replay" element={<AttackReplay />} />
+            <Route path="/chaos" element={<ChaosStudio />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/api-playground" element={<ApiPlayground />} />
           </Routes>

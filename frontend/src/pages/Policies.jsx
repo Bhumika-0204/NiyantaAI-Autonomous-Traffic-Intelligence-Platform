@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, ShieldAlert, Sliders, Activity, Server, Lock, Globe, UserX, Network, ServerCog, Save, CheckCircle, Loader } from 'lucide-react';
+import { Shield, ShieldAlert, Sliders, Activity, Server, Lock, Globe, UserX, Network, ServerCog, Save, CheckCircle, Loader, Eye, Key } from 'lucide-react';
+import { getApiUrl, API_BASE_URL } from '../config';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const API_BASE = getApiUrl();
 
 export default function Policies() {
   const [aclForm, setAclForm] = useState({});
@@ -286,6 +287,122 @@ export default function Policies() {
                   <div className={`w-4 h-4 bg-white rounded-full transform transition-transform ${securityPolicies.vpnAccessEnabled ? 'translate-x-5' : 'translate-x-0'}`}></div>
                 </div>
               </label>
+            </div>
+          </div>
+
+          {/* Real-Time Webhook Alert Integration */}
+          <div className="bg-gray-900 border border-blue-900/40 rounded-2xl overflow-hidden shadow-lg">
+            <div className="bg-gradient-to-r from-blue-500/10 to-transparent p-6 border-b border-gray-800">
+              <h3 className="text-xl font-bold flex items-center gap-2 text-white">
+                <Globe className="text-blue-400" /> Real-Time Alert Webhooks (Slack / Discord / Telegram)
+              </h3>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wider text-gray-400">Webhook Integration Target</label>
+                <select 
+                  className="w-full mt-2 bg-gray-950 border border-gray-800 rounded-xl p-3 text-white text-sm focus:outline-none focus:border-blue-500"
+                  defaultValue="slack"
+                  onChange={(e) => window.__webhook_type = e.target.value}
+                >
+                  <option value="slack">Slack Webhook Channel</option>
+                  <option value="discord">Discord Webhook Channel</option>
+                  <option value="telegram">Telegram Bot API</option>
+                  <option value="custom">Custom JSON Webhook Endpoint</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wider text-gray-400">Webhook URL Endpoint</label>
+                <input 
+                  type="text" 
+                  placeholder="https://hooks.slack.com/services/..."
+                  className="w-full mt-2 bg-gray-950 border border-gray-800 rounded-xl p-3 text-white text-sm font-mono focus:outline-none focus:border-blue-500"
+                  onChange={(e) => window.__webhook_url = e.target.value}
+                />
+              </div>
+
+              <div className="pt-2 flex justify-between items-center">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const url = window.__webhook_url;
+                    const type = window.__webhook_type || "slack";
+                    if (!url) {
+                      alert("Please enter a valid Webhook URL first.");
+                      return;
+                    }
+                    await fetch(`${API_BASE_URL}/alerts/config`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ webhook_url: url, webhook_type: type, alert_enabled: true })
+                    });
+                    const res = await fetch(`${API_BASE_URL}/alerts/test`, { method: 'POST' });
+                    const resJson = await res.json();
+                    alert("Test alert dispatched! Status: " + (resJson.status || "OK"));
+                  }}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold transition"
+                >
+                    Save & Dispatch Test Alert
+                </button>
+                <span className="text-xs text-gray-500">Sends alerts when CPU &gt; 80% or DDoS detected</span>
+              </div>
+            </div>
+          </div>
+          {/* Shadow Mode / Dark Launching Card */}
+          <div className="bg-gray-900 border border-purple-900/40 rounded-2xl overflow-hidden shadow-lg">
+            <div className="bg-gradient-to-r from-purple-500/10 to-transparent p-6 border-b border-gray-800 flex justify-between items-center">
+              <div>
+                <h3 className="text-xl font-bold flex items-center gap-2 text-white">
+                  <Eye className="text-purple-400" /> Shadow Mode / Dark Launching
+                </h3>
+                <p className="text-xs text-gray-400 mt-1">Evaluates AI risk scores silently without blocking production traffic.</p>
+              </div>
+              <button
+                type="button"
+                onClick={async () => {
+                  const current = window.__shadow_enabled || false;
+                  const next = !current;
+                  await fetch(`${API_BASE_URL}/shadow-mode/toggle`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enabled: next })
+                  });
+                  window.__shadow_enabled = next;
+                  alert(`Shadow Mode is now ${next ? 'ENABLED (Silent AI Evaluation)' : 'DISABLED (Active Blocking Enforcement)'}`);
+                }}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-semibold transition"
+              >
+                Toggle Shadow Mode
+              </button>
+            </div>
+          </div>
+
+          {/* Tiered API Key Quotas Card */}
+          <div className="bg-gray-900 border border-emerald-900/40 rounded-2xl overflow-hidden shadow-lg">
+            <div className="bg-gradient-to-r from-emerald-500/10 to-transparent p-6 border-b border-gray-800">
+              <h3 className="text-xl font-bold flex items-center gap-2 text-white">
+                <Key className="text-emerald-400" /> Tiered API Key Rate-Limit Quotas
+              </h3>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-gray-950 p-4 rounded-xl border border-gray-800">
+                  <span className="text-xs font-bold text-gray-400 uppercase">Free Tier Key</span>
+                  <p className="text-sm font-mono text-emerald-400 mt-1">FREE_KEY_123</p>
+                  <p className="text-xs text-gray-500 mt-2">Quota: 100 req/min</p>
+                </div>
+                <div className="bg-gray-950 p-4 rounded-xl border border-gray-800">
+                  <span className="text-xs font-bold text-blue-400 uppercase">Pro Tier Key</span>
+                  <p className="text-sm font-mono text-blue-400 mt-1">PRO_KEY_456</p>
+                  <p className="text-xs text-gray-500 mt-2">Quota: 5,000 req/min</p>
+                </div>
+                <div className="bg-gray-950 p-4 rounded-xl border border-gray-800">
+                  <span className="text-xs font-bold text-purple-400 uppercase">Enterprise Key</span>
+                  <p className="text-sm font-mono text-purple-400 mt-1">ENT_KEY_789</p>
+                  <p className="text-xs text-gray-500 mt-2">Quota: 50,000 req/min</p>
+                </div>
+              </div>
             </div>
           </div>
 

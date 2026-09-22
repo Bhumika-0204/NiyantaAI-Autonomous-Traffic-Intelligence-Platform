@@ -1,15 +1,20 @@
-FROM node:20-alpine
+# Build stage
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
-
-RUN npm install
+RUN npm ci || npm install
 
 COPY . .
+RUN npm run build
 
-EXPOSE 5173
+# Production Nginx stage
+FROM nginx:alpine
 
-# Typically you would build static assets for prod (npm run build),
-# But for local full-stack dev we use the dev server
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
